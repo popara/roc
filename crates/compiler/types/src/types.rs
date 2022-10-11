@@ -213,17 +213,17 @@ pub struct AliasCommon {
     pub lambda_set_variables: Vec<LambdaSet>,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct OptAbleVar {
     pub var: Variable,
-    pub opt_ability: Option<Symbol>,
+    pub opt_abilities: Option<Vec<Symbol>>,
 }
 
 impl OptAbleVar {
     pub fn unbound(var: Variable) -> Self {
         Self {
             var,
-            opt_ability: None,
+            opt_abilities: None,
         }
     }
 }
@@ -231,14 +231,14 @@ impl OptAbleVar {
 #[derive(PartialEq, Eq, Debug)]
 pub struct OptAbleType {
     pub typ: Type,
-    pub opt_ability: Option<Symbol>,
+    pub opt_abilities: Option<Vec<Symbol>>,
 }
 
 impl OptAbleType {
     pub fn unbound(typ: Type) -> Self {
         Self {
             typ,
-            opt_ability: None,
+            opt_abilities: None,
         }
     }
 }
@@ -390,7 +390,7 @@ impl Clone for OptAbleType {
         // This passes through `Type`, so defer to that to bump the clone counter.
         Self {
             typ: self.typ.clone(),
-            opt_ability: self.opt_ability,
+            opt_abilities: self.opt_abilities.clone(),
         }
     }
 }
@@ -536,8 +536,8 @@ impl fmt::Debug for Type {
 
                 for arg in type_arguments {
                     write!(f, " {:?}", &arg.typ)?;
-                    if let Some(ab) = arg.opt_ability {
-                        write!(f, ":{:?}", ab)?;
+                    if let Some(abs) = &arg.opt_abilities {
+                        write!(f, ":{:?}", abs)?;
                     }
                 }
 
@@ -1335,7 +1335,7 @@ impl Type {
                                 arg_ann.region,
                                 OptAbleType {
                                     typ: arg_ann.value.clone(),
-                                    opt_ability: alias_var.value.opt_bound_ability,
+                                    opt_abilities: alias_var.value.opt_bound_abilities.clone(),
                                 },
                             ));
                         }
@@ -1381,7 +1381,7 @@ impl Type {
                                 value:
                                     AliasVar {
                                         var: placeholder,
-                                        opt_bound_ability,
+                                        opt_bound_abilities,
                                         ..
                                     },
                                 ..
@@ -1398,7 +1398,7 @@ impl Type {
                             );
                             named_args.push(OptAbleType {
                                 typ: filler.value.clone(),
-                                opt_ability: *opt_bound_ability,
+                                opt_abilities: opt_bound_abilities.clone(),
                             });
                             substitution.insert(*placeholder, filler.value);
                         }
@@ -2092,8 +2092,8 @@ impl AliasKind {
 pub struct AliasVar {
     pub name: Lowercase,
     pub var: Variable,
-    /// `Some` if this variable is bound to an ability; `None` otherwise.
-    pub opt_bound_ability: Option<Symbol>,
+    /// `Some` if this variable is bound to abilities; `None` otherwise.
+    pub opt_bound_abilities: Option<Vec<Symbol>>,
 }
 
 impl AliasVar {
@@ -2101,7 +2101,7 @@ impl AliasVar {
         Self {
             name,
             var,
-            opt_bound_ability: None,
+            opt_bound_abilities: None,
         }
     }
 }
@@ -2110,7 +2110,7 @@ impl From<&AliasVar> for OptAbleVar {
     fn from(av: &AliasVar) -> OptAbleVar {
         OptAbleVar {
             var: av.var,
-            opt_ability: av.opt_bound_ability,
+            opt_abilities: av.opt_bound_abilities.clone(),
         }
     }
 }
