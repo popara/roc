@@ -8009,4 +8009,22 @@ mod solve_expr {
             print_only_under_alias: true
         );
     }
+
+    #[test]
+    fn multiple_variables_bound_to_an_ability() {
+        infer_eq_without_problem(
+            indoc!(
+                r#"
+                app "test" provides [main] to "./platform"
+
+                F a : a | a has Hash
+
+                main : F a -> F a
+                #^^^^{-1}
+                "#
+            ),
+            @"main : a -[[main(0)]]-> a | a has Hash"
+            print_only_under_alias: true
+        );
+    }
 }
