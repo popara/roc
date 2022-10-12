@@ -4,6 +4,7 @@ use crate::subs::{
     GetSubsSlice, RecordFields, Subs, UnionTags, VarStore, Variable, VariableSubsSlice,
 };
 use roc_collections::all::{HumanIndex, ImMap, ImSet, MutMap, MutSet, SendMap};
+use roc_collections::VecSet;
 use roc_error_macros::internal_error;
 use roc_module::called_via::CalledVia;
 use roc_module::ident::{ForeignSymbol, Ident, Lowercase, TagName};
@@ -216,7 +217,7 @@ pub struct AliasCommon {
 #[derive(Clone, Debug)]
 pub struct OptAbleVar {
     pub var: Variable,
-    pub opt_abilities: Option<Vec<Symbol>>,
+    pub opt_abilities: Option<VecSet<Symbol>>,
 }
 
 impl OptAbleVar {
@@ -231,7 +232,7 @@ impl OptAbleVar {
 #[derive(PartialEq, Eq, Debug)]
 pub struct OptAbleType {
     pub typ: Type,
-    pub opt_abilities: Option<Vec<Symbol>>,
+    pub opt_abilities: Option<VecSet<Symbol>>,
 }
 
 impl OptAbleType {
@@ -2093,7 +2094,8 @@ pub struct AliasVar {
     pub name: Lowercase,
     pub var: Variable,
     /// `Some` if this variable is bound to abilities; `None` otherwise.
-    pub opt_bound_abilities: Option<Vec<Symbol>>,
+    /// INVARIANT: if abilities are present, they are sorted and de-duplicated.
+    pub opt_bound_abilities: Option<VecSet<Symbol>>,
 }
 
 impl AliasVar {
