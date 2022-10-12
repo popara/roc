@@ -11457,4 +11457,26 @@ All branches in an `if` must have the same type!
     Note: `Hash` cannot be generated for functions.
     "###
     );
+
+    test_report!(
+        duplicate_ability_in_has_clause,
+        indoc!(
+            r#"
+            f : a -> {} | a has Hash & Hash
+
+            f
+            "#
+        ),
+    @r###"
+    ── DUPLICATE BOUND ABILITY ─────────────────────────────── /code/proj/Main.roc ─
+
+    I already saw that this type variable is bound to the `Hash` ability
+    once before:
+
+    4│      f : a -> {} | a has Hash & Hash
+                                       ^^^^
+
+    Abilities only need to bound to a type variable once in a `has` clause!
+    "###
+    );
 }
