@@ -8012,7 +8012,7 @@ mod solve_expr {
 
     #[test]
     fn multiple_variables_bound_to_an_ability() {
-        infer_eq_without_problem(
+        infer_queries!(
             indoc!(
                 r#"
                 app "test" provides [main] to "./platform"
