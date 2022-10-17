@@ -4088,6 +4088,24 @@ fn pattern_match_char() {
 
 #[test]
 #[cfg(any(feature = "gen-llvm", feature = "gen-wasm"))]
+fn issue_4348() {
+    assert_evals_to!(
+        indoc!(
+            r#"
+            str = "z"
+            (\_ ->
+                when str is
+                    "z" -> "okay"
+                    _ -> "") "FAIL"
+            "#
+        ),
+        RocStr::from("okay"),
+        RocStr
+    );
+}
+
+#[test]
+#[cfg(any(feature = "gen-llvm", feature = "gen-wasm"))]
 fn issue_4349() {
     assert_evals_to!(
         indoc!(
